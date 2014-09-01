@@ -1,0 +1,43 @@
+# ButtonConfig.txt Notes
+#
+#   - First, set up all of your account information properly in
+#     AliasList.txt.
+#   - Then, edit the values below. The format should be as follows:
+#        Button#
+#        Title of the button
+#        The alias that the button launches
+#   - The maximum amount of buttons you can have is 7.
+#   - Buttons will only be drawn if you've changed their default title.
+#     If you want to hide a button, change the title back to
+#     "Button # Title".
+#   - Remember, you can set up a button to launch more than one account.
+#   - You will have to use the "Redraw Buttons" button in order for
+#     changes in this file to take effect.
+
+Button1
+Button 1 Title
+alias123
+
+Button2
+Button 2 Title
+alias123
+
+Button3
+Button 3 Title
+alias123
+
+Button4
+Button 4 Title
+alias123
+
+Button5
+Button 5 Title
+alias123
+
+Button6
+Button 6 Title
+alias123
+
+Button7
+Button 7 Title
+alias123

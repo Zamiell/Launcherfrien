@@ -1,0 +1,16 @@
+# AliasList.txt Notes
+#
+#   - Specify all of your account information here.
+#   - DefaultSpace will only be used if you are logging on more than
+#     one account at a time.
+#   - If you are using VirtueDesktops, DefaultSpace should correspond
+#     to the respective desktop.
+#   - CustomConfigFile is optional. If you specify a file name here,
+#     I will look for that file in
+#     /Users/YourName/Library/Application Support/EverQuest/
+#     and copy it over eqclient.ini before launching that particular
+#     alias. (However, this won't happen if launching multiple accounts.)
+#   - The format of the file should be as follows:
+#        Alias Account Password DefaultSpace CustomConfigFile
+
+zam sprinkles1 a5ghqlzj 1
