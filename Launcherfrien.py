@@ -1,6 +1,7 @@
-#!/usr/bin/python
+#! /usr/bin/python
 
-import sys
+# Imports
+import sys # For sys.exit()
 import socket, ssl
 import re
 import getpass
@@ -10,8 +11,10 @@ from multiprocessing import Process, Queue
 from Tkinter import *
 import ConfigParser
 
-version = '1.04b'
+# Global variables
+version = '1.05'
 
+# The graphical user interface
 class GUI:
 	def __init__(self, parent):
 		parent.geometry('925x350-50-70')
@@ -107,23 +110,6 @@ class GUI:
 		w = Label(parent, text="Miscellaneous", font=("Helvetica", 16))
 		w.place(x=780, y=15)
 
-		self.c1var = IntVar()
-		self.c1 = Checkbutton(parent, text="Use the test client", variable=self.c1var, command=self.testClientCheck, justify=LEFT)
-		self.c1.place(x=745, y=60)
-		temp = os.popen('ls /Users/' + getpass.getuser() + '/Applications/EverQuest\ Mac\ Test.app/Contents/MacOS/EverQuest 2>&1').read().strip()
-		match = re.search('No such file', temp)
-		if match:
-			self.usingTestClient = 0
-		else:
-			config = ConfigParser.RawConfigParser()
-			config.optionxform = str
-			config.read('./Config/config.ini')
-			if config.get('Main', 'UsingTestClient') == 'Yes':
-				self.c1.select()
-				self.usingTestClient = 1
-			else:
-				self.usingTestClient = 0
-
 		self.c2var = IntVar()
 		self.c2 = Checkbutton(parent, text="Automatically close\nEQ dialog boxes", variable=self.c2var, command=self.closeDialogBoxes, justify=LEFT)
 		self.c2.place(x=745, y=90)
@@ -217,27 +203,8 @@ class GUI:
 		else:
 			w = Label(boxInstructions, text="-  Launch more than one account at a time by separating aliases with spaces.", font=("Helvetica", 14))
 			w.pack(anchor="w", padx=10)
-			if TotalSpacesRunning:
-				w = Label(boxInstructions, text="   All accounts will launch at the same time and will go to the same space. You will have to", font=("Helvetica", 14))
-				w.pack(anchor="w", padx=10)
-				w = Label(boxInstructions, text="   manually separate the EQ instances by using the TotalSpaces \"instant expose\" hotkey.", font=("Helvetica", 14))
-				w.pack(anchor="w", padx=10)
-				w = Label(boxInstructions, text="   When doing this, if you manage to screw up the window alignment, use the \"Realign Windows\" buttton.", font=("Helvetica", 14))
-				w.pack(anchor="w", padx=10)
-			elif osxVersion > 6:
-				w = Label(boxInstructions, text="   All accounts will launch at the same time and will go to the same space. You will have to", font=("Helvetica", 14))
-				w.pack(anchor="w", padx=10)
-				w = Label(boxInstructions, text="   manually separate the EQ instances by using the Mission Control spaces overview (Ctrl+Up).", font=("Helvetica", 14))
-				w.pack(anchor="w", padx=10)
-				w = Label(boxInstructions, text="   When doing this, if you manage to screw up the window alignment, use the \"Realign Windows\" buttton.", font=("Helvetica", 14))
-				w.pack(anchor="w", padx=10)
-			if VDRunning:
-				w = Label(boxInstructions, text="   All accounts will launch at the same time; Launcherfrien will sort into the specified desktops.", font=("Helvetica", 14))
-				w.pack(anchor="w", padx=10)
-			else:
-				w = Label(boxInstructions, text="   All accounts will launch at the same time; Launcherfrien will sort into the specified spaces.", font=("Helvetica", 14))
-				w.pack(anchor="w", padx=10)
 			w = Label(boxInstructions, text="   When you hear the second sound effect, Launcherfrien is done launching.", font=("Helvetica", 14))
+			w = Label(boxInstructions, text="   See the Launcherfrien post on the TAKP forums for more details.", font=("Helvetica", 14))
 			w.pack(anchor="w", padx=10)
 			if osxVersion <= 6:
 				w = Label(boxInstructions, text="-  Note that you can manually drag EQ instances around using the spaces zoom-out feature if needed.", font=("Helvetica", 14))
@@ -392,24 +359,6 @@ class GUI:
 		self.launchedByButton = True
 		self.launchByAlias(self.button7alias)
 
-	def testClientCheck(self):
-		temp = os.popen('ls /Users/' + getpass.getuser() + '/Applications/EverQuest\ Mac\ Test.app/Contents/MacOS/EverQuest 2>&1').read().strip()
-		match = re.search('No such file', temp)
-		if match:
-			self.c1.deselect()
-			self.oops('You don\'t appear to have the test client downloaded.')
-		else:
-			self.usingTestClient = self.c1var.get()
-			config = ConfigParser.RawConfigParser()
-			config.optionxform = str
-			config.read('./Config/config.ini')
-			if self.usingTestClient == 0:
-				config.set('Main', 'UsingTestClient', 'No')
-			else:
-				config.set('Main', 'UsingTestClient', 'Yes')
-			with open('./Config/config.ini', 'wb') as configfile:
-			    config.write(configfile)
-
 	def closeDialogBoxes(self):
 		config = ConfigParser.RawConfigParser()
 		config.optionxform = str
@@ -425,7 +374,7 @@ class GUI:
 				os.system('./Tools/EQPopupDaemon.py &')
 			config.set('Main', 'CloseDialogBoxes', 'Yes')
 		with open('./Config/config.ini', 'wb') as configfile:
-		    config.write(configfile)
+			config.write(configfile)
 
 	def disableSoundCheck(self):
 		self.disableSoundEffects = self.c3var.get()
@@ -437,7 +386,7 @@ class GUI:
 		else:
 			config.set('Main', 'DisableSoundEffects', 'Yes')
 		with open('./Config/config.ini', 'wb') as configfile:
-		    config.write(configfile)
+			config.write(configfile)
 
 	def launchSpeed(self):
 		boxLaunchSpeed = Toplevel()
@@ -445,7 +394,7 @@ class GUI:
 		w = Label(boxLaunchSpeed, text="", font=("Helvetica", 14))
 		w.pack()
 		self.c4var = IntVar()
-		self.c4 = Checkbutton(boxLaunchSpeed, text="Normal - Log on multiple accounts concurrently.", variable=self.c4var, command=self.c4command, justify=LEFT)
+		self.c4 = Checkbutton(boxLaunchSpeed, text="Normal - Log on multiple accounts concurrently. Automatic sorting will only work on OSX 10.6.", variable=self.c4var, command=self.c4command, justify=LEFT)
 		self.c4.pack(anchor="w", padx=10)
 		self.c5var = IntVar()
 		self.c5 = Checkbutton(boxLaunchSpeed, text="Slower - Log on multiple accounts one at a time. This allows automatic sorting on OSX 10.7+.", variable=self.c5var, command=self.c5command, justify=LEFT)
@@ -478,7 +427,7 @@ class GUI:
 			config.read('./Config/config.ini')
 			config.set('Main', 'MultipleAccountLaunchSpeed', 'Normal')
 			with open('./Config/config.ini', 'wb') as configfile:
-			    config.write(configfile)
+				config.write(configfile)
 
 	def c5command(self):
 		if self.c5var.get() == 0:
@@ -492,7 +441,7 @@ class GUI:
 			config.read('./Config/config.ini')
 			config.set('Main', 'MultipleAccountLaunchSpeed', 'Slower')
 			with open('./Config/config.ini', 'wb') as configfile:
-			    config.write(configfile)
+				config.write(configfile)
 			self.oops('I have no idea what your space/desktop hotkeys\nare set to, but this feature will only work\nproperly if you have your hotkeys mapped to\nCommand+1, Command+2, and so forth.\n\nIf you use different hotkeys, see the forum\nthread for instructions on how to manually\ncustomize me.')
 
 	def c6command(self):
@@ -507,14 +456,11 @@ class GUI:
 			config.read('./Config/config.ini')
 			config.set('Main', 'MultipleAccountLaunchSpeed', 'Slowest')
 			with open('./Config/config.ini', 'wb') as configfile:
-			    config.write(configfile)
+				config.write(configfile)
 			self.oops('I have no idea what your space/desktop hotkeys\nare set to, but this feature will only work\nproperly if you have your hotkeys mapped to\nCommand+1, Command+2, and so forth.\n\nIf you use different hotkeys, see the forum\nthread for instructions on how to manually\ncustomize me.')
 
 	def realignWindows(self):
-		if self.usingTestClient == 0:
-			pids = os.popen('ps auwx | grep -v grep | grep "/Applications/EverQuest Mac.app/Contents/MacOS/EverQuest" | awk \'{print $2}\'').read().strip().split()
-		else:
-			pids = os.popen('ps auwx | grep -v grep | grep "/Applications/EverQuest Mac Test.app/Contents/MacOS/EverQuest" | awk \'{print $2}\'').read().strip().split()
+		pids = os.popen('ps auwx | grep -v grep | grep "' + EQPath + '" | awk \'{print $2}\'').read().strip().split()
 		success = True
 		for pid in pids:
 			os.system('./Tools/Activate ' + pid)
@@ -530,16 +476,14 @@ class GUI:
 			self.oops('I failed realigning all the windows. Do an "/mc i" in all EQ instances and try again.')
 
 	def activateWindows(self):
-		if self.usingTestClient == 0:
-			pids = os.popen('ps auwx | grep -v grep | grep "/Applications/EverQuest Mac.app/Contents/MacOS/EverQuest" | awk \'{print $2}\'').read().strip().split()
-		else:
-			pids = os.popen('ps auwx | grep -v grep | grep "/Applications/EverQuest Mac Test.app/Contents/MacOS/EverQuest" | awk \'{print $2}\'').read().strip().split()
+		pids = os.popen('ps auwx | grep -v grep | grep "' + EQPath + '" | awk \'{print $2}\'').read().strip().split()
 		for pid in pids:
 			os.system('./Tools/Activate ' + pid)
 		if self.disableSoundEffects == 0:
 			os.system('afplay ./Sounds/navi.wav &')
 
 	def launchByAccountPassword(self, text):
+		# Validate that we have a username and password
 		if self.account.get() == '' and self.password.get() == '':
 			return
 		if self.account.get() == '':
@@ -547,8 +491,9 @@ class GUI:
 			return
 		if self.password.get() == '':
 			self.oops('You have to enter a password.')
-			return	
+			return
 
+		# Change the graphic and play a sound
 		root.geometry('542x350')
 		w1 = Canvas(root, width=280, height=350)
 		w1.place(x=265, y=0)
@@ -569,59 +514,48 @@ class GUI:
 		if self.disableSoundEffects == 0:
 			os.system('afplay ./Sounds/magic.mp3 &')
 
-		q = Queue()
-		self.getTicket(self.account.get().strip(), self.password.get().strip(), 99, q)
-		time.sleep(0.1)
-		if q.empty():
-			root.geometry('925x350')
-			w1.destroy()
-			w2.destroy()
-			w3.destroy()
-			w4.destroy()
-			return
-		arguments = q.get()
+		# Prepare the arguments
+		arguments = ('patchme /ticket:' + self.account.get() + '/' + self.password.get(), 99)
 
-		os.system('defaults write com.apple.CrashReporter DialogType none')
+		# Launch EQ
+		os.system('defaults write com.apple.CrashReporter DialogType none') # Disable the annoying crash popup in case EQ crashes on boot
 		q = Queue()
-		self.useTicket(arguments[0], 99, q)
+		self.useTicket(arguments[0], arguments[1], q)
 		time.sleep(0.1)
 		temp = q.get()
 		pid = temp[0]
 		time.sleep(2)
 		os.system('./Tools/Activate ' + pid) # /mc i
-		time.sleep(4) # wait for the EQ instance to fill the screen
+		time.sleep(4) # Wait for the EQ instance to fill the screen
 
-		if self.usingTestClient == 0:
-			temp = os.popen('ps auwx | grep -v grep | grep "/Applications/EverQuest Mac.app/Contents/MacOS/EverQuest" | awk \'{print $2}\' | grep ' + pid).read().strip()
-		else:
-			temp = os.popen('ps auwx | grep -v grep | grep "/Applications/EverQuest Mac Test.app/Contents/MacOS/EverQuest" | awk \'{print $2}\' | grep ' + pid).read().strip()
-		if temp == '': # it crashed
+		# Check to see if EQ crashed on boot
+		temp = os.popen('ps auwx | grep -v grep | grep "' + EQPath + '" | awk \'{print $2}\' | grep ' + pid).read().strip()
+		if temp == '': # It crashed
 			if self.disableSoundEffects == 0:
 				os.system('afplay ./Sounds/thunder.mp3 &')
 			q = Queue()
-			self.useTicket(arguments[0], 99, q)
+			self.useTicket(arguments[0], arguments[1], q)
 			time.sleep(0.1)
 			temp = q.get()
 			pid = temp[0]
 			time.sleep(2)
 			os.system('./Tools/Activate ' + pid) # /mc i
-			time.sleep(4) # wait for the EQ instance to fill the screen
+			time.sleep(4) # Wait for the EQ instance to fill the screen
 
-			if self.usingTestClient == 0:
-				temp = os.popen('ps auwx | grep -v grep | grep "/Applications/EverQuest Mac.app/Contents/MacOS/EverQuest" | awk \'{print $2}\' | grep ' + pid).read().strip()
-			else:
-				temp = os.popen('ps auwx | grep -v grep | grep "/Applications/EverQuest Mac Test.app/Contents/MacOS/EverQuest" | awk \'{print $2}\' | grep ' + pid).read().strip()
-			if temp == '': # it crashed again
+			# Check to see if EQ crashed two times in a row
+			temp = os.popen('ps auwx | grep -v grep | grep "' + EQPath + '" | awk \'{print $2}\' | grep ' + pid).read().strip()
+			if temp == '': # It crashed again
 				self.oops('I\'m giving up on launching account ' + self.account.get() + '\nsince it crashed while launching twice in a row.\nThis shouldn\'t normally happen.')
 				root.geometry('925x350')
 				w1.destroy()
 				w2.destroy()
 				w3.destroy()
 				w4.destroy()
-				os.system('defaults write com.apple.CrashReporter DialogType prompt')
+				os.system('defaults write com.apple.CrashReporter DialogType prompt') # Disable the annoying crash popup in case EQ crashes on boot
 				return
 
-		if VDRunning: # fix OSX cursor popout
+		# Fix the OSX cursor popout bug with VD
+		if VDRunning:
 			os.system('./Tools/Activate ' + pid)
 			time.sleep(0.1)
 			os.system('osascript -e \'tell application "Finder" to activate\'')
@@ -637,7 +571,7 @@ class GUI:
 		w2.destroy()
 		w3.destroy()
 		w4.destroy()
-		os.system('defaults write com.apple.CrashReporter DialogType prompt')
+		os.system('defaults write com.apple.CrashReporter DialogType prompt') # Disable the annoying crash popup in case EQ crashes on boot
 
 	def launchByAliasPrep(self, text):
 		self.launchedByButton = False
@@ -645,21 +579,23 @@ class GUI:
 		self.launchByAlias(value)
 
 	def launchByAlias(self, text):
+		# Validate that the user entered something other than spaces
 		text = text.strip()
 		if text == '':
 			return
 
+		# Validate that AliasList.txt still exists
 		try:
 			with open('./Config/AliasList.txt'): pass
 		except IOError:
 			self.oops('AliasList.txt doesn\'t exist or cannot be opened.')
 			return
 
+		# Go through all of the aliases that the user entered
 		nameList = text.split()
 		usernameList = []
 		passwordList = []
 		desktopList = []
-
 		for name in nameList:
 			try:
 				with open('./Config/AliasList.txt') as f:
@@ -695,18 +631,23 @@ class GUI:
 				self.oops('Could not find "' + name + '" in AliasList.txt.')
 				return
 
+		# Return if the usernameList is blank for some reason
 		if usernameList == []:
 			return
+
+		# If we are launching more than one instance, validate that we can launch more than one instance
 		if len(usernameList) > 1:
 			if VDRunning == False and spacesRunning == False:
 		 		self.oops('You need either VirtueDesktops or Spaces to launch more than one account at a time.')
 		 		return
-			if VDRunning and spacesRunning == False: 	
+			if VDRunning and spacesRunning == False:
 				self.oops('You must have Spaces enabled to launch more than one account at a time.\n(VirtueDesktops and Spaces can function concurrently.)')
 				return
 		 	if VDRunning and VDMisconfigured:
 			 	self.oops('In order to launch more than one account at a time, you will need your VirtueDesktops properly configured.\nRight now, some of your desktops are inproperly named.\nSet up your desktops with names from "1" to "16" and make sure they align properly with the respective Spaces.')
 			 	return
+
+		# Validate that the custom eqclient.ini files are present
 		if len(usernameList) == 1 and eqclientini != 'eqclient.ini':
 			try:
 				with open('/Users/' + getpass.getuser() + '/Library/Application Support/EverQuest/' + eqclientini): pass
@@ -714,16 +655,18 @@ class GUI:
 				self.oops('I can\'t find the custom eqclient.ini file that is supposed to be at:\n/Users/' + getpass.getuser() + '/Library/Application Support/EverQuest/' + eqclientini)
 				return
 			os.system('cp /Users/' + getpass.getuser() + '/Library/Application\ Support/EverQuest/' + eqclientini + ' /Users/' + getpass.getuser() + '/Library/Application\ Support/EverQuest/eqclient.ini')
-				
+
+		# Update the alias history
 		if self.launchedByButton == False:
 			self.alias.delete(0, END)
 			self.aliasHistoryIndex = 0
-			os.system('sed -i "" -e "/^' + text + '$/d" ./Config/aliasHistory') # delete all past occurances of this alias
+			os.system('sed -i "" -e "/^' + text + '$/d" ./Config/aliasHistory') # Delete all past occurances of this alias
 			aliasHistory = os.popen('cat ./Config/aliasHistory').read().strip().split('\n')
 			if len(aliasHistory) > 100:
-				os.system('sed -i "" -e "1d" ./Config/aliasHistory') # remove the first line
+				os.system('sed -i "" -e "1d" ./Config/aliasHistory') # Remove the first line
 			os.system('echo ' + text + ' >> ./Config/aliasHistory')
 
+		# Change the graphic and play a sound
 		root.geometry('542x350')
 		w1 = Canvas(root, width=270, height=350)
 		w1.place(x=265, y=0)
@@ -758,35 +701,14 @@ class GUI:
 			os.system('afplay ./Sounds/magic.mp3 &')
 		errorHappened = False
 
-		p = []
-		q = Queue()
-		for i in range(len(usernameList)):
-			p.append(Process(target=self.getTicket, args=(usernameList[i], passwordList[i], desktopList[i], q,)))
-			p[i].start()
-		for i in range(len(p)):
-			p[i].join()
-		time.sleep(0.1)
+		# Make an arguments list
 		argumentsList = []
+		for i in range(len(usernameList)):
+			argumentsList.append(('patchme /ticket:' + usernameList[i] + '/' + passwordList[i], desktopList[i]))
 
-		while q.empty() == False:
-			argumentsList.append(q.get())
-
-		if len(argumentsList) < len(usernameList):
-			temp = len(usernameList) - len(argumentsList)
-			if len(argumentsList) > 0:
-				self.oops(str(temp) + ' account(s) failed to get a login ticket. Perhaps a bad username or password?\nI logged on the rest of the accounts though.')
-				errorHappened = True
-			else:
-				self.oops(str(temp) + ' account(s) failed to get a login ticket. Perhaps a bad username or password?')
-				root.geometry('925x350')
-				w1.destroy()
-				w2.destroy()
-				w3.destroy()
-				w4.destroy()
-				return
-
-		if len(usernameList) == 1 or self.launchMode == 0: # concurrent launching
-			os.system('defaults write com.apple.CrashReporter DialogType none')
+		# We are doing concurrent launching
+		if len(usernameList) == 1 or self.launchMode == 0:
+			os.system('defaults write com.apple.CrashReporter DialogType none') # Disable the annoying crash popup in case EQ crashes on boot
 			p = []
 			q = Queue()
 			for i in range(len(argumentsList)):
@@ -800,27 +722,22 @@ class GUI:
 				pidList.append(q.get())
 			time.sleep(2)
 			os.system('./Tools/Activate ' + pidList[0][0]) # /mc i, can only do one of them though
-			time.sleep(4) # wait for the EQ instance to fill the screen
+			time.sleep(4) # Wait for the EQ instance to fill the screen
 
+			# Check to see if any of the instances crashed on boot
 			crashedArgsList = []
 			i = 0
-			while i < len(pidList): # check for crashed instances
-				if self.usingTestClient == 0:
-					temp = os.popen('ps auwx | grep -v grep | grep "/Applications/EverQuest Mac.app/Contents/MacOS/EverQuest" | awk \'{print $2}\' | grep ' + pidList[i][0]).read().strip()
-				else:
-					temp = os.popen('ps auwx | grep -v grep | grep "/Applications/EverQuest Mac Test.app/Contents/MacOS/EverQuest" | awk \'{print $2}\' | grep ' + pidList[i][0]).read().strip()
-				if temp == '': # it crashed
+			while i < len(pidList):
+				temp = os.popen('ps auwx | grep -v grep | grep "' + EQPath + '" | awk \'{print $2}\' | grep ' + pidList[i][0]).read().strip()
+				if temp == '': # It crashed
 					if self.disableSoundEffects == 0:
 						os.system('afplay ./Sounds/thunder.mp3 &')
 					crashedDesktop = pidList[i][1]
 					pidList.remove(pidList[i])
 					i -= 1
 					j = 0
-					while j < len(argumentsList): # find the corresponding arguments
-						if self.usingTestClient == 0:
-							temp = os.popen('ps auwx | grep -v grep | grep "/Applications/EverQuest Mac.app/Contents/MacOS/EverQuest" | grep "' + argumentsList[j][0] + '"').read().strip()
-						else:
-							temp = os.popen('ps auwx | grep -v grep | grep "/Applications/EverQuest Mac Test.app/Contents/MacOS/EverQuest" | grep "' + argumentsList[j][0] + '"').read().strip()
+					while j < len(argumentsList): # Find the corresponding arguments
+						temp = os.popen('ps auwx | grep -v grep | grep "' + EQPath + '" | grep "' + argumentsList[j][0] + '"').read().strip()
 						if temp == '':
 							if argumentsList[j][1] == crashedDesktop:
 								crashedArgsList.append((argumentsList[j][0], crashedDesktop))
@@ -828,6 +745,7 @@ class GUI:
 						j += 1
 				i += 1
 
+			# One or more instances crashed
 			if len(crashedArgsList) > 0:
 				p = []
 				q = Queue()
@@ -844,32 +762,35 @@ class GUI:
 					crashedPIDList.append(temp)
 				time.sleep(2)
 				os.system('./Tools/Activate ' + crashedPIDList[0][0]) # /mc i, can only do one of them though
-				time.sleep(4) # wait for the EQ instance to fill the screen
+				time.sleep(4) # Wait for the EQ instance to fill the screen
 
+				# Check to see if the same instance crashed twice in a row
 				for pid in crashedPIDList:
-					if self.usingTestClient == 0:
-						temp = os.popen('ps auwx | grep -v grep | grep "/Applications/EverQuest Mac.app/Contents/MacOS/EverQuest" | awk \'{print $2}\' | grep ' + pid[0]).read().strip()
-					else:
-						temp = os.popen('ps auwx | grep -v grep | grep "/Applications/EverQuest Mac Test.app/Contents/MacOS/EverQuest" | awk \'{print $2}\' | grep ' + pid[0]).read().strip()
-					if temp == '': # it crashed again
+					temp = os.popen('ps auwx | grep -v grep | grep "' + EQPath + '" | awk \'{print $2}\' | grep ' + pid[0]).read().strip()
+					if temp == '': # It crashed again
 						if len(usernameList) > 1:
 							self.oops('I\'m giving up on launching one or more accounts\nsince it crashed while launching twice in a row.\nThis shouldn\'t normally happen.\nI\'ll still log in the other accounts, though.')
-						else:				
+						else:
 							self.oops('I\'m giving up on launching account ' + usernameList[0] + '\nsince it crashed while launching twice in a row.\nThis shouldn\'t normally happen.')
-			
+
+			# Move the EQ window to the intended space; this will only work on OSX 10.6
 			if osxVersion <= 6 and len(usernameList) > 1:
 				for pid in pidList:
 					temp = os.popen('./Tools/EQGetWID ' + pid[0]).read().strip()
 					match = re.search(r'(\d+) \d+', temp)
 					os.system('./Tools/MoveWindow ' + match.group(1) + ' ' + pid[1])
 
-		else: # logging on multiple characters one at a time
+		# We are logging on multiple characters one at a time
+		else:
+			# Start EQ #1 after 2 seconds, EQ #2 after 4 seconds, EQ #3 after 6 seconds, and so forth
 			p = []
 			q = Queue()
 			for i in range(len(argumentsList)):
 				p.append(Process(target=self.useTicketDelayed, args=(argumentsList[i][0], argumentsList[i][1], q, i,)))
 				p[i].start()
 			time.sleep(0.1)
+
+			# Switch to the space for this EQ instance
 			pidList = []
 			for i in range(len(argumentsList)):
 				if argumentsList[i][1] == '1':
@@ -906,15 +827,20 @@ class GUI:
 					os.system('osascript -e \'tell application "System Events" to key code {22} using {command down, shift down}\'') # 6
 
 				pidList.append(q.get())
+
+				# Try to automatically /mc i
 				if self.launchMode == 2:
 					endTime = time.time() + 0.5 # 0.75 is too high
 					while time.time() <= endTime:
-						os.system('./Tools/Activate ' + pidList[i][0]) # /mc i constantly because why the fuck not
+						os.system('./Tools/Activate ' + pidList[i][0]) # Try to activate constantly because it can't hurt anything
+
+				# Wait for EQ to open
 				while True:
 					if os.system('./Tools/EQIsWindowOpen ' + pidList[i][0]) == 0:
 						break
 
-		if VDRunning: # fix OSX cursor popout
+		# Fix the OSX cursor popout bug with VD
+		if VDRunning:
 			for pid in pidList:
 				os.system('./Tools/Activate ' + pid[0])
 				time.sleep(0.1)
@@ -923,6 +849,7 @@ class GUI:
 				os.system('./Tools/Activate ' + pid[0])
 				time.sleep(0.1)
 
+		# Done
 		if self.disableSoundEffects == 0:
 			os.system('afplay ./Sounds/success.mp3 &')
 		root.geometry('925x350')
@@ -930,53 +857,14 @@ class GUI:
 		w2.destroy()
 		w3.destroy()
 		w4.destroy()
-		os.system('defaults write com.apple.CrashReporter DialogType prompt')
+		os.system('defaults write com.apple.CrashReporter DialogType prompt') # Disable the annoying crash popup in case EQ crashes on boot
 		if errorHappened:
 			os.system('osascript -e \'tell application "System Events" to tell process "Python" to activate\'')
 			os.system('osascript -e \'tell application "System Events" to set frontmost of process "Python" to true\'')
 			time.sleep(0.1)
 
-	def getTicket(self, username, password, desktop, q):
-		try:
-			s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-			ssl_sock = ssl.wrap_socket(s)
-			ssl_sock.connect(('lp.soe.com', 443))
-			ssl_sock.write('POST /eqmac/live/login HTTP/1.1\r\nHost: lp.soe.com\r\nContent-Length: 57\r\n\r\nusername=' + username + '&password=' + password + '&rememberPassword=false\r\n')
-			data = ssl_sock.read()
-			match = re.search(r'HTTP/1.1 504 Gateway Timeout', data)
-			if match:
-				self.oops('Gateway timeout detected! You will have to wait a while in order to log on with account "' + username + '".')
-				return
-			match = re.search(r'HTTP/1.1 401 Unauthorized', data)
-			if match:
-				self.oops('The password of "' + password + '" appears to be wrong.')
-				return
-			match = re.search(r'Set-Cookie: lp-token=.+\nSet-Cookie: lp-token=(.+); secure', data)
-			cookie = match.group(1)
-			del ssl_sock
-			s.close()
-
-			s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-			ssl_sock = ssl.wrap_socket(s)
-			ssl_sock.connect(('lp.soe.com', 443))
-			ssl_sock.write('POST /eqmac/live/get_play_session HTTP/1.1\r\nHost: lp.soe.com\r\nContent-Length: 16\r\nCookie: lp-token=' + cookie + '\r\n\r\nts=2000000000000\r\n')
-			data = ssl_sock.read()
-			match = re.search(r'patchme /login:\d+ /ticket:................', data)
-			arguments = match.group()
-			del ssl_sock
-			s.close()
-
-			q.put((arguments, desktop))
-
-		except:
-			if s: s.close()
-			self.oops('The request timed out or something else went wrong. Usually, this means a bad account name or password.')		
-
 	def useTicket(self, arguments, desktop, q):
-		if self.usingTestClient == 0:
-			pid = os.popen('nohup /Users/' + getpass.getuser() + '/Applications/EverQuest\ Mac.app/Contents/MacOS/EverQuest ' + arguments + ' > /dev/null 2> /dev/null & echo $!').read().strip()
-		else:
-			pid = os.popen('nohup /Users/' + getpass.getuser() + '/Applications/EverQuest\ Mac\ Test.app/Contents/MacOS/EverQuest ' + arguments + ' > /dev/null 2> /dev/null & echo $!').read().strip()
+		pid = os.popen('nohup "' + EQPath + '" ' + arguments + ' > /dev/null 2> /dev/null & echo $!').read().strip()
 		q.put((pid, desktop))
 
 	def useTicketDelayed(self, arguments, desktop, q, i):
@@ -986,40 +874,121 @@ class GUI:
 			time.sleep(i)
 		self.useTicket(arguments, desktop, q)
 
-def checkVDBoxConfirm():
-	global timeForSwitching
-	timeForSwitching = True
-	checkVDBox.destroy()
+# --------------------
+#  The main function
+# --------------------
 
+# Validate that the tools are executable
+if not os.access("./Tools/Activate", os.X_OK):
+	os.system('chmod +x ./Tools/Activate')
+if not os.access("./Tools/AssistiveDevicesCheck", os.X_OK):
+	os.system('chmod +x ./Tools/AssistiveDevicesCheck')
+if not os.access("./Tools/EQGetWID", os.X_OK):
+	os.system('chmod +x ./Tools/EQGetWID')
+if not os.access("./Tools/EQGetWIDAll", os.X_OK):
+	os.system('chmod +x ./Tools/EQGetWIDAll')
+if not os.access("./Tools/EQIsWindowOpen", os.X_OK):
+	os.system('chmod +x ./Tools/EQIsWindowOpen')
+if not os.access("./Tools/EQPopupDaemon.py", os.X_OK):
+	os.system('chmod +x ./Tools/EQPopupDaemon.py')
+if not os.access("./Tools/EQPopupDetect", os.X_OK):
+	os.system('chmod +x ./Tools/EQPopupDetect')
+if not os.access("./Tools/EQWindowRealign", os.X_OK):
+	os.system('chmod +x ./Tools/EQWindowRealign')
+if not os.access("./Tools/GetCurrentSpace", os.X_OK):
+	os.system('chmod +x ./Tools/GetCurrentSpace')
+if not os.access("./Tools/MoveWindow", os.X_OK):
+	os.system('chmod +x ./Tools/MoveWindow')
+if not os.access("./Tools/spaces-util", os.X_OK):
+	os.system('chmod +x ./Tools/spaces-util')
+if not os.access("./Tools/GetWindowList", os.X_OK):
+	os.system('chmod +x ./Tools/GetWindowList')
+
+# Try to find out where the EverQuest is installed
+if os.path.exists('/Applications/EverQuest.app/Contents/MacOS/EverQuest'):
+	EQPath = '/Applications/EverQuest.app/Contents/MacOS/EverQuest'
+elif os.path.exists('/Applications/EverQuest Mac.app/Contents/MacOS/EverQuest'):
+	EQPath = '/Applications/EverQuest Mac.app/Contents/MacOS/EverQuest'
+elif os.path.exists('/Users/' + getpass.getuser() + '/Applications/EverQuest.app/Contents/MacOS/EverQuest'):
+	EQPath = '/Users/' + getpass.getuser() + '/Applications/EverQuest.app/Contents/MacOS/EverQuest'
+elif os.path.exists('/Users/' + getpass.getuser() + '/Applications/EverQuest Mac.app/Contents/MacOS/EverQuest'):
+	EQPath = '/Users/' + getpass.getuser() + '/Applications/EverQuest Mac.app/Contents/MacOS/EverQuest'
+elif os.path.exists('/Applications/EverQuest Mac Test.app/Contents/MacOS/EverQuest'):
+	EQPath = '/Applications/EverQuest Mac Test.app/Contents/MacOS/EverQuest'
+elif os.path.exists('/Users/' + getpass.getuser() + '/Applications/EverQuest Mac Test.app/Contents/MacOS/EverQuest'):
+	EQPath = '/Applications/EverQuest Mac Test.app/Contents/MacOS/EverQuest'
+else:
+	EQPathBox = Tk()
+	EQPathBox.wm_title("Launcherfrien")
+	w = Label(EQPathBox, text="I can't find out where your EverQuest application\nis located. Try putting EverQuest in the\n\"/Applications\" directory.")
+	w.pack(padx=10, pady=10)
+	w = Button(EQPathBox, text="OK", command=EQPathBox.destroy)
+	w.pack(pady=10)
+	os.system('osascript -e \'tell application "System Events" to tell process "Python" to activate\'')
+	os.system('osascript -e \'tell application "System Events" to set frontmost of process "Python" to true\'')
+	EQPathBox.mainloop()
+	sys.exit(1)
+
+# Validate that the eqhost.txt is correct
+EQDirectory = EQPath[:-16] # Strip off the /MacOS/EverQuest
+temp = os.popen('md5 "' + EQDirectory + '/Resources/eqhost.txt"').read().strip()
+match = re.search(r'MD5 \(.+\) = (.+)', temp)
+if match:
+	if not match.group(1) == '0ebc749efae3cc9c2c5e5483be8871c1':
+		# Create a new "eqhost.txt" from scratch
+		os.system('echo "[Registration Servers]" > "' + EQDirectory + '/Resources/eqhost.txt"')
+		os.system('echo "{" >> "' + EQDirectory + '/Resources/eqhost.txt"')
+		os.system('echo \'"loginserver.takproject.net:6000"\' >> "' + EQDirectory + '/Resources/eqhost.txt"')
+		os.system('echo "}" >> "' + EQDirectory + '/Resources/eqhost.txt"')
+		os.system('echo "[Login Servers]" >> "' + EQDirectory + '/Resources/eqhost.txt"')
+		os.system('echo "{" >> "' + EQDirectory + '/Resources/eqhost.txt"')
+		os.system('echo \'"loginserver.takproject.net:6000"\' >> "' + EQDirectory + '/Resources/eqhost.txt"')
+		os.system('echo "}" >> "' + EQDirectory + '/Resources/eqhost.txt"')
+
+		# Let the user know what we did
+		EQHostBox = Tk()
+		EQHostBox.wm_title("Launcherfrien")
+		w = Label(EQHostBox, text="Your \"eqhost.txt\" file was wrong. Don't worry, I've took the liberty to fix it for you.")
+		w.pack(padx=10, pady=10)
+		w = Button(EQHostBox, text="OK", command=EQHostBox.destroy)
+		w.pack(pady=10)
+		os.system('osascript -e \'tell application "System Events" to tell process "Python" to activate\'')
+		os.system('osascript -e \'tell application "System Events" to set frontmost of process "Python" to true\'')
+		EQHostBox.mainloop()
+
+# Validate that AliasList.txt exists
 try:
 	with open('./Config/AliasList.txt'): pass
 except IOError:
 	os.system('touch ./Config/AliasList.txt')
 
+# Validate that aliasHistory exists
 try:
 	with open('./Config/aliasHistory'): pass
 except IOError:
 	os.system('touch ./Config/aliasHistory')
 
+# Validate that ButtonConfig.txt exists
 try:
 	with open('./Config/ButtonConfig.txt'): pass
 except IOError:
 	os.system('touch ./Config/ButtonConfig.txt')
 
+# Validate that config.ini exists
 try:
 	with open('./Config/config.ini'): pass
 except IOError:
 	config = ConfigParser.RawConfigParser()
 	config.optionxform = str
 	config.add_section('Main')
-	config.set('Main', 'UsingTestClient', 'No')
 	config.set('Main', 'CloseDialogBoxes', 'No')
 	config.set('Main', 'VirtueDesktopsConfiguredCorrectly', 'No')
 	config.set('Main', 'DisableSoundEffects', 'No')
 	config.set('Main', 'MultipleAccountLaunchSpeed', 'Normal')
 	with open('./Config/config.ini', 'wb') as configfile:
-	    config.write(configfile)
+		config.write(configfile)
 
+# Get the current version of OSX
 temp = os.popen('osascript -e \'system version of (system info)\'').read().strip()
 match = re.search(r'\d+\.(\d+)\.\d+', temp)
 if match:
@@ -1028,12 +997,15 @@ else:
 	match = re.search(r'\d+\.(\d+)', temp)
 	osxVersion = int(match.group(1))
 
+# Check to see if Launcherfrien has access to assistive devices in the OSX system preferences
 temp = os.popen('./Tools/AssistiveDevicesCheck').read().strip()
 if temp == '0':
 	assistiveDevicesBox = Tk()
 	assistiveDevicesBox.wm_title("Launcherfrien")
-	if osxVersion > 7:
+	if osxVersion == 8:
 		w = Label(assistiveDevicesBox, text="In order to use Launcherfrien you have to turn on\n\"Enable access for assistive devices\" in\nSystem Preferences --> Accessibility.")
+	elif osxVersion > 8:
+		w = Label(assistiveDevicesBox, text="In order to use Launcherfrien you have to enable it\nin the \"Accessibility\" section in\nSystem Preferences --> Security & Privacy.")
 	else:
 		w = Label(assistiveDevicesBox, text="In order to use Launcherfrien you have to turn on\n\"Enable access for assistive devices\" in\nSystem Preferences --> Universal Access.")
 	w.pack(padx=10, pady=10)
@@ -1044,24 +1016,34 @@ if temp == '0':
 	assistiveDevicesBox.mainloop()
 	sys.exit(1)
 
-temp = os.popen('ps auwx | grep -v grep | grep TotalSpaces.app').read().strip()
+# Check to see if TotalSpaces is running
+temp = os.popen('ps auwx | grep -v grep | grep TotalSpaces').read().strip()
 if temp == '':
 	TotalSpacesRunning = False
 else:
 	TotalSpacesRunning = True
 
+# Check to see if Spaces is running
 temp = os.popen('./Tools/spaces-util -n').read().strip()
 if temp == 'Spaces is not enabled':
 	spacesRunning = False
 else:
 	spacesRunning = True
 
+# Check to see if VirtueDesktops is running
 temp = os.popen('ps auwx | grep -v grep | grep VirtueDesktops.app').read().strip()
 if temp == '':
 	VDRunning = False
 else:
 	VDRunning = True
 
+# Used in the popup box for VD/Spaces validation
+def checkVDBoxConfirm():
+	global timeForSwitching
+	timeForSwitching = True
+	checkVDBox.destroy()
+
+# Confirm that VirtueDesktops will play nicely with Spaces
 if spacesRunning and VDRunning:
 	VDMisconfigured = False
 	config = ConfigParser.RawConfigParser()
@@ -1081,6 +1063,7 @@ if spacesRunning and VDRunning:
 		os.system('osascript -e \'tell application "System Events" to set frontmost of process "Python" to true\'')
 		checkVDBox.mainloop()
 
+		# The user consented to doing the check
 		if timeForSwitching:
 			currentDesktop = os.popen('osascript -e \'tell application "VirtueDesktops" to get title of active desktop\'').read().strip()
 			for i in range(1, 17):
@@ -1098,7 +1081,7 @@ if spacesRunning and VDRunning:
 					VDErrorBox.mainloop()
 					VDMisconfigured == True
 					break
-	
+
 				time.sleep(0.1)
 				temp = os.popen('./Tools/GetCurrentSpace').read().strip()
 				if temp != str(i):
@@ -1129,12 +1112,11 @@ if spacesRunning and VDRunning:
 				config.read('./Config/config.ini')
 				config.set('Main', 'VirtueDesktopsConfiguredCorrectly', 'Yes')
 				with open('./Config/config.ini', 'wb') as configfile:
-				    config.write(configfile)
+					config.write(configfile)
 
+# Start the GUI
 root = Tk()
 gui = GUI(root)
 os.system('osascript -e \'tell application "System Events" to tell process "Python" to activate\'')
 os.system('osascript -e \'tell application "System Events" to set frontmost of process "Python" to true\'')
 root.mainloop()
-
-# Sum of source code for the separate programs is 312

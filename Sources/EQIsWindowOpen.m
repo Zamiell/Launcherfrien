@@ -16,14 +16,15 @@ int main(int argc, char **argv) {
 	if (argc != 2) {
 		printf("usage: %s <pid>\n", argv[0]);
 		exit(1);
-	} else
+	} else {
 		pid = atoi(argv[1]);
+	}
 
 	windowList = CGWindowListCopyWindowInfo(kCGWindowListExcludeDesktopElements, kCGNullWindowID);
 
 	for (NSMutableDictionary* entry in (NSArray*)windowList) {
 		windowName = [entry objectForKey:(id)kCGWindowName];
-		result = [windowName isEqualToString:@"EverQuest - 1.2.7"];
+		result = [windowName isEqualToString:@"EverQuest - 1.2.8"];
 		if (result) {
 			windowOwnerPID = [[entry objectForKey:(id)kCGWindowOwnerPID] integerValue];
 			if (windowOwnerPID == pid) {
